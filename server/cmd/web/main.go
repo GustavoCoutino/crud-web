@@ -18,7 +18,10 @@ import (
 type application struct {
 	logger *slog.Logger
 	users *models.UsersModel
+    registros *models.RegistrosModel
+    logros *models.LogrosModel
 	formDecoder *form.Decoder
+    jwtSecret string
 }
 
 func main(){
@@ -40,6 +43,8 @@ func main(){
 		logger: logger,
 		formDecoder: formDecoder,
 		users: &models.UsersModel{DB: db},
+        registros: &models.RegistrosModel{DB: db},
+        logros: &models.LogrosModel{DB: db},
 	}
 	logger.Info("starting server", "addr", addr)
 	 err = http.ListenAndServe(*addr, app.routes())
