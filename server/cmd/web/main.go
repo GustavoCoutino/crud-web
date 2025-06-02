@@ -45,6 +45,7 @@ func main(){
 		users: &models.UsersModel{DB: db},
         registros: &models.RegistrosModel{DB: db},
         logros: &models.LogrosModel{DB: db},
+        jwtSecret: os.Getenv("JWTSECRET"),
 	}
 	logger.Info("starting server", "addr", addr)
 	 err = http.ListenAndServe(*addr, app.routes())

@@ -16,7 +16,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("PATCH /registros/{id}", app.requireAuth(http.HandlerFunc(app.editRegistro)))
 	mux.Handle("DELETE /registros/{id}", app.requireAuth(http.HandlerFunc(app.deleteRegistro)))
 
-	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+	standard := alice.New(app.recoverPanic, app.logRequest, enableCORS, commonHeaders)
 
     return standard.Then(mux)
 }
