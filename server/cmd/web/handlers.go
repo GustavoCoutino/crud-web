@@ -94,16 +94,33 @@ func (app *application) createRegistro(w http.ResponseWriter, r *http.Request){
 }
 
 func (app *application) viewRegistro(w http.ResponseWriter, r *http.Request) {
-    userID := getUserID(r)
-    registros, err := app.registros.Latest(userID)
-    if err != nil {
-        app.serverError(w, r, err)
-        return
-    }
-    w.Header().Set("Content-Type", "application/json")
-    app.writeJSON(w, map[string]interface{}{
-        "registros": registros,
-    })
+	userID := getUserID(r)
+	registros, err := app.registros.Latest(userID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	var registrosWithLogros []map[string]interface{}
+	
+	for _, registro := range registros {
+		logro, err := app.logros.Get(registro.ID_Logro)
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+		
+		registroWithLogro := map[string]interface{}{
+			"registro": registro,
+			"logro": logro,
+		}
+		registrosWithLogros = append(registrosWithLogros, registroWithLogro)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	app.writeJSON(w, map[string]interface{}{
+		"registros": registrosWithLogros,
+	})
 }
 
 func (app *application) editRegistro(w http.ResponseWriter, r *http.Request) {

@@ -15,6 +15,36 @@ export function AuthProvider({ children }) {
 
   const API_BASE_URL = "http://localhost:4000";
 
+  const setCookie = (name, value, days = 7) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  };
+
+  const getCookie = (name) => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === " ") c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  };
+
+  const deleteCookie = (name) => {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+  };
+
+  useEffect(() => {
+    const token = getCookie("auth-token");
+    if (token) {
+      fetchUser();
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -26,7 +56,7 @@ export function AuthProvider({ children }) {
 
   const fetchUser = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getCookie("auth-token");
       if (!token) {
         setLoading(false);
         return;
@@ -38,7 +68,7 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error("Error obteniendo usuario:", error);
-      localStorage.removeItem("token");
+      deleteCookie("auth-token");
       localStorage.removeItem("user");
       setUser(null);
     } finally {
@@ -59,6 +89,7 @@ export function AuthProvider({ children }) {
       const data = await response.json();
 
       if (response.ok) {
+        setCookie("auth-token", data.token);
         localStorage.setItem("token", data.token);
         const userInfo = {
           id: data.user_id,
@@ -99,6 +130,7 @@ export function AuthProvider({ children }) {
       const data = await response.json();
 
       if (response.ok) {
+        setCookie("auth-token", data.token);
         localStorage.setItem("token", data.token);
         const userInfo = {
           id: data.user_id,
@@ -125,6 +157,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = useCallback(() => {
+    deleteCookie("auth-token");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
