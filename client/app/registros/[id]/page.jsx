@@ -50,7 +50,6 @@ export default function EditRegistro({ params }) {
       }
       router.push("/registros");
     } catch (err) {
-      console.error("Error editing registro:", err);
       setError("Error al editar el registro");
     }
   };

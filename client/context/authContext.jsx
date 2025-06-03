@@ -67,7 +67,6 @@ export function AuthProvider({ children }) {
         setUser(JSON.parse(userInfo));
       }
     } catch (error) {
-      console.error("Error obteniendo usuario:", error);
       deleteCookie("auth-token");
       localStorage.removeItem("user");
       setUser(null);
@@ -106,7 +105,6 @@ export function AuthProvider({ children }) {
         };
       }
     } catch (error) {
-      console.error("Error durante el login:", error);
       return {
         success: false,
         error: "Error de red",

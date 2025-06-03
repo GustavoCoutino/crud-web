@@ -29,7 +29,6 @@ function Login() {
       setError(
         "Ocurrió un error al iniciar sesión. Por favor, inténtalo de nuevo más tarde."
       );
-      console.error("Error durante el login:", error);
     }
   };
   return (
