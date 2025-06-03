@@ -25,6 +25,10 @@ type registroCreateForm struct {
     validator.Validator `json:"-"`
 }
 
+// createRegistro maneja la creación de nuevos registros de logros.
+// Valida los datos del formulario, crea un logro en la BD, y luego
+// crea el registro asociado al usuario autenticado.
+// Retorna JSON con el ID del registro creado o errores de validación.
 func (app *application) createRegistro(w http.ResponseWriter, r *http.Request){
     var form registroCreateForm
 
@@ -93,6 +97,9 @@ func (app *application) createRegistro(w http.ResponseWriter, r *http.Request){
     })
 }
 
+// viewRegistro maneja la visualización de todos los registros de un usuario.
+// Obtiene el id del usuario autenticado y retorna un json
+// con todos los registros que tenga el usuario
 func (app *application) viewRegistro(w http.ResponseWriter, r *http.Request) {
 	userID := getUserID(r)
 	registros, err := app.registros.Latest(userID)
@@ -123,6 +130,10 @@ func (app *application) viewRegistro(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// editRegistro maneja la edición de un registro existente.
+// Valida los datos del formulario, primero edita un logro, y luego
+// edita el registro asociado al usuario autenticado.
+// Retorna un JSON con el id del registro editado, junto a un mensaje de éxito.
 func (app *application) editRegistro(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	if idStr == "" {
@@ -227,6 +238,10 @@ func (app *application) editRegistro(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// deleteRegistro maneja la eliminación de un registro existente.
+// Valida que el id del registro sea válido, y primero elimina el registro,
+// y después el logro. Regresa un JSON con un mensaje indicando que la eliminación
+// fue exitosa
 func (app *application) deleteRegistro(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	if idStr == "" {

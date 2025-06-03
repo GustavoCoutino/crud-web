@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// commonHeaders es una funcion de middleware que sirve para establecer los headers comunes a cada respuesta
+// antes de pasar control al manejador original
 func commonHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Security-Policy",
@@ -21,6 +23,9 @@ func commonHeaders(next http.Handler) http.Handler {
 	})
 }
 
+// enableCORS es una funcion de middleware que establece la configuracion de CORS para permitir
+// el acceso a ciertos origines, que métodos puede realizar, y que headers debe mandar
+// en el request
 func enableCORS(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
@@ -37,6 +42,8 @@ func enableCORS(next http.Handler) http.Handler {
     })
 }
 
+// logRequest es un middleware que registra información básica de cada request.
+// Captura la IP del cliente, protocolo HTTP, método y URI para logging.
 func (app *application) logRequest(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         var (
@@ -52,6 +59,9 @@ func (app *application) logRequest(next http.Handler) http.Handler {
     })
 }
 
+// recoverPanic es un middleware que captura y maneja panics en handlers.
+// Previene que la aplicación se cierre inesperadamente y convierte
+// los panics en errores HTTP 500 con logging apropiado.
 func (app *application) recoverPanic(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         defer func() {

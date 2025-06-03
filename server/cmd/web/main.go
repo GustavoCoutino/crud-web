@@ -53,6 +53,8 @@ func main(){
     os.Exit(1)
 }
 
+// openDB inicia la conexión a la base de datos
+// para realizar las operaciones de los modelos
 func openDB() (*sql.DB, error) {
     cfg := mysql.NewConfig()
     cfg.User = os.Getenv("DBUSER")

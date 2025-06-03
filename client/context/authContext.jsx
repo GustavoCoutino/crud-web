@@ -15,12 +15,14 @@ export function AuthProvider({ children }) {
 
   const API_BASE_URL = "http://localhost:4000";
 
+  // Configurar cookie con opciones de seguridad apropiadas
   const setCookie = (name, value, days = 7) => {
     const expires = new Date();
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
   };
 
+  // Obtener valor de una cookie específica
   const getCookie = (name) => {
     const nameEQ = name + "=";
     const ca = document.cookie.split(";");
@@ -32,10 +34,12 @@ export function AuthProvider({ children }) {
     return null;
   };
 
+  // Eliminar cookie estableciendo fecha de expiración en el pasado
   const deleteCookie = (name) => {
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
   };
 
+  // Intentar restaurar sesión desde cookie al cargar la aplicación
   useEffect(() => {
     const token = getCookie("auth-token");
     if (token) {
@@ -45,15 +49,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
+  // Cargar información del usuario desde localStorage si hay token válido
   const fetchUser = useCallback(async () => {
     try {
       const token = getCookie("auth-token");
@@ -75,6 +71,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // Autenticar usuario con email y contraseña
   const login = async (email, password) => {
     try {
       setLoading(true);
@@ -114,6 +111,7 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Registrar nuevo usuario con datos completos
   const register = async (nombre, apellido, email, password) => {
     try {
       setLoading(true);
@@ -154,6 +152,7 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Cerrar sesión y limpiar todos los datos de autenticación
   const logout = useCallback(() => {
     deleteCookie("auth-token");
     localStorage.removeItem("token");
@@ -161,6 +160,7 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  // Generar headers de autenticación para requests API
   const getAuthHeaders = useCallback(() => {
     const token = localStorage.getItem("token");
     return {

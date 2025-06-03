@@ -32,17 +32,23 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-
+// hashPassword genera un hash seguro de la contraseña usando bcrypt.
+// Retorna el hash como string y cualquier error que ocurra durante el proceso.
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes), err
 }
 
+// checkPassword compara una contraseña ingresada y una contraseña hasheada
+// y verifica si son iguales
 func checkPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
+// generateToken crea un JWT token válido por 24 horas.
+// Incluye el userID y email en los claims para identificación.
+// El token se firma con el secret configurado en variables de entorno.
 func (app *application) generateToken(userID int, email string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	
@@ -59,6 +65,9 @@ func (app *application) generateToken(userID int, email string) (string, error) 
 	return token.SignedString([]byte(app.jwtSecret))
 }
 
+// validateToken parsea un token y verifica que sea válido. Primero crear un objeto
+// tipo Claims para asignarle los valores del token recibido en los parámetros.
+// Si el token es válido, se regresa la variable claims
 func (app *application) validateToken(tokenString string) (*Claims, error) {
 	claims := &Claims{}
 	
@@ -77,6 +86,10 @@ func (app *application) validateToken(tokenString string) (*Claims, error) {
 	return claims, nil
 }
 
+// requireAuth es un middleware que valida tokens JWT en requests.
+// Extrae el token del header Authorization, lo valida, y agrega
+// X-User-ID y X-User-Email headers para uso en handlers posteriores.
+// Si el token es inválido, retorna 401 Unauthorized.
 func (app *application) requireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
@@ -108,12 +121,18 @@ func (app *application) requireAuth(next http.Handler) http.Handler {
 	})
 }
 
+// getUserID extrae el ID del usuario desde el header X-User-ID del request.
+// Este header es establecido por el middleware requireAuth después de validar el JWT
 func getUserID(r *http.Request) int {
 	userIDStr := r.Header.Get("X-User-ID")
 	userID, _ := strconv.Atoi(userIDStr)
 	return userID
 }
 
+// register maneja el registro de nuevos usuarios.
+// Valida los datos del formulario, verifica que el email no exista,
+// hashea la contraseña y crea el usuario en la base de datos.
+// Retorna un JWT token si el registro es exitoso.
 func (app *application) register(w http.ResponseWriter, r *http.Request) {
 	var form registerForm
 
@@ -177,6 +196,9 @@ func (app *application) register(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// login maneja la autenticación de usuarios existentes.
+// Valida las credenciales (email y contraseña) contra la base de datos
+// y retorna un JWT token si las credenciales son correctas.
 func (app *application) login(w http.ResponseWriter, r *http.Request) {
 	var form loginForm
 
