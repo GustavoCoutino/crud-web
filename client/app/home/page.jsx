@@ -1,28 +1,21 @@
 "use client";
 import { useGetRegistros } from "@/hooks/useGetRegistros";
-import { PlusCircle, Calendar, Target, TrendingUp } from "lucide-react";
+import { PlusCircle, Calendar, Target } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/loading";
+import Error from "@/components/error";
+import RegistroItem from "@/components/RegistroItem";
 
 function HomePage() {
   const { registros, loading, error } = useGetRegistros();
   const router = useRouter();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Error: {error}
-        </div>
-      </div>
-    );
+    return <Error error={error} />;
   }
 
   const registrosList = registros?.registros || [];
@@ -78,72 +71,27 @@ function HomePage() {
               Tu Registro Más Reciente
             </h2>
 
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                {registrosList[0].logro.titulo}
-              </h3>
-
-              <p className="text-gray-700 text-lg mb-6 leading-relaxed">
-                {registrosList[0].logro.descripcion}
-              </p>
-
-              <div className="border-t border-gray-200 pt-6">
-                <div className="flex items-center justify-between text-gray-600">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-5 h-5" />
-                    <span className="font-medium">Inicio:</span>
-                    <span>
-                      {new Date(
-                        registrosList[0].registro.inicio_semana
-                      ).toLocaleDateString("es-ES", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-gray-600 mt-3">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-5 h-5" />
-                    <span className="font-medium">Fin:</span>
-                    <span>
-                      {new Date(
-                        registrosList[0].registro.fin_semana
-                      ).toLocaleDateString("es-ES", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 flex justify-center">
-                <button
-                  onClick={() => router.push("/registros")}
-                  className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium border border-blue-200 hover:border-blue-300 px-6 py-3 rounded-lg transition-colors"
+            <RegistroItem registro={registrosList[0]} />
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => router.push("/registros")}
+                className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium border border-blue-200 hover:border-blue-300 px-6 py-3 rounded-lg transition-colors"
+              >
+                <span>Ver Todos los Registros</span>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <span>Ver Todos los Registros</span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
-              </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         )}
