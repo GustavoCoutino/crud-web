@@ -6,6 +6,7 @@ import { PlusCircle } from "lucide-react";
 import Loading from "@/components/loading";
 import DeleteModal from "@/components/DeleteModal";
 import NoRegistrosMessage from "@/components/NoRegistrosMessage";
+import RegistroItemActions from "@/components/RegistroItemActions";
 import { useDeleteRegistro } from "@/hooks/useDeleteRegistro";
 
 function Registros() {
@@ -32,7 +33,17 @@ function Registros() {
   const registrosList = registros?.registros || [];
 
   const handleEdit = (registroId) => {
-    router.push(`/registros/editar/${registroId}`);
+    const registro = registrosList.find(
+      (r) => r.registro.id_registro === registroId
+    );
+    const params = new URLSearchParams({
+      titulo: registro?.logro?.titulo || "",
+      descripcion: registro?.logro?.descripcion || "",
+      inicio_semana: registro?.registro.inicio_semana || "",
+      fin_semana: registro?.registro.fin_semana || "",
+    });
+
+    router.push(`/registros/${registroId}?${params.toString()}`);
   };
 
   const handleDeleteClick = (registro) => {

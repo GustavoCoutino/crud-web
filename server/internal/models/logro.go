@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 type Logro struct {
@@ -46,19 +47,16 @@ func (m *LogrosModel) Get(id int) (Logro, error) {
 
 func (m *LogrosModel) Update(id int, titulo string, descripcion string) error {
     stmt := `UPDATE logro SET titulo = ?, descripcion = ? WHERE id_logro = ?`
-    
     result, err := m.DB.Exec(stmt, titulo, descripcion, id)
     if err != nil {
+        fmt.Println("error in the statement")
         return err
     }
     
-    rowsAffected, err := result.RowsAffected()
+    _, err = result.RowsAffected()
     if err != nil {
+        fmt.Println("error in the rows affected")
         return err
-    }
-    
-    if rowsAffected == 0 {
-        return ErrNoRecord
     }
     
     return nil
